@@ -5,6 +5,9 @@
 
     RewriteEngine On
 
+    # Prevent repository metadata and other dotfiles from being served publicly.
+    RewriteRule (^|/)\. - [F]
+
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]

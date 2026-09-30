@@ -12,11 +12,12 @@ class AuthController extends Controller
     {
         $credentials = $request->validate([
             'email' => ['required', 'email', 'max:254'],
-            'password' => ['required', 'string', 'min:6', 'max:255'],
+            'password' => ['required', 'string', 'min:8', 'max:255'],
         ]);
 
         $user = DB::table('usuario')
             ->where('email', strtolower(trim($credentials['email'])))
+            ->whereRaw("LOWER(rol) = 'repartidor'")
             ->first();
         $courier = $user ? DB::table('repartidor')->where('id_usuario', $user->id_usuario)->first() : null;
 
@@ -27,6 +28,9 @@ class AuthController extends Controller
         }
 
         $request->session()->regenerate();
+        $request->session()->put('id_usuario', (int) $user->id_usuario);
+        $request->session()->put('id_repartidor', (int) $courier->id_repartidor);
+        $request->session()->put('usuario_rol', 'repartidor');
         $request->session()->put('repartidor', [
             'id_usuario' => (int) $user->id_usuario,
             'id_repartidor' => (int) $courier->id_repartidor,
@@ -37,5 +41,13 @@ class AuthController extends Controller
         ]);
 
         return redirect()->route('inicio');
+    }
+
+    public function logout(Request $request)
+    {
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('login');
     }
 }

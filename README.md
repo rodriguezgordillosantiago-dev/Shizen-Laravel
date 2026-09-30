@@ -7,6 +7,16 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
+## Shizen Repartidor
+
+This project serves the courier app through Laravel routes, controllers, Blade views, and session-backed endpoints. Point the web server document root at `public/`; supported legacy page and API URLs dispatch through Laravel rather than serving copied PHP pages directly.
+
+Courier accounts are checked against the existing `usuario` and `repartidor` tables. Delivery screens and JSON operations require a courier session. Configure the existing database connection in `.env`; this app intentionally does not create or reset the shared business schema. State-changing forms and requests use Laravel CSRF protection.
+
+For local XAMPP, copy `.env.example` to `.env`, set the MySQL credentials, and generate an app key with `php artisan key:generate`. Point Apache at `public/`. The account-registration link uses `SHIZEN_HOME_URL` to open the Home Laravel registration form. Run the focused route checks with `php artisan test --filter=CourierRoutesTest`.
+
+Run the focused courier route checks with `php artisan test --filter=CourierRoutesTest`.
+
 ## About Laravel
 
 Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:

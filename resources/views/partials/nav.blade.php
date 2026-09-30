@@ -12,6 +12,7 @@
       <path stroke-linecap="round" stroke-linejoin="round" d="m4 7 8-4 8 4-8 4-8-4Zm0 0v10l8 4 8-4V7M12 11v10"/>
     </svg>
     <span>Activos</span>
+    <b class="badge" id="badge-activos"></b>
   </a>
 
   <button id="delivery-status-toggle" class="nav-status-toggle" type="button" aria-pressed="false">
@@ -23,11 +24,12 @@
     <span class="nav-status-label">Activo</span>
   </button>
 
-  <a href="{{ route('pedidos') }}" class="nav-item {{ request()->routeIs('pedidos') ? 'is-active' : '' }}" aria-label="Pedidos">
+  <a href="{{ url('/notificaciones') }}" class="nav-item {{ request()->is('notificaciones*') ? 'is-active' : '' }}" aria-label="Notificaciones">
     <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M6 7h12l-1 13H7L6 7Zm3 0a3 3 0 0 1 6 0M9 12v4m6-4v4"/>
+      <path stroke-linecap="round" stroke-linejoin="round" d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9Zm-8 13h4"/>
     </svg>
-    <span>Pedidos</span>
+    <span>Notificaciones</span>
+    <b class="badge" id="badge-notificaciones"></b>
   </a>
 
   <a href="{{ route('perfil') }}" class="nav-item {{ request()->routeIs('perfil', 'configuracion') ? 'is-active' : '' }}" aria-label="Perfil">

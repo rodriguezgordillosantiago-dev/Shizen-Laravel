@@ -1,21 +1,123 @@
 <!doctype html>
 <html lang="es">
-<head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Shizen Repartidor - Iniciar sesión</title>
-  <link rel="stylesheet" href="{{ asset('css/login.css') }}?v=scale-1">
-</head>
-<body>
-  <div class="blob-wrap"><svg class="blob" viewBox="0 0 375 332" preserveAspectRatio="none"><path d="M0 0h375v220c-35 60-95 40-155 50S60 250 0 260V0Z" fill="#2d6a31"/></svg></div>
-  <div class="logo-container"><img class="logo" src="{{ asset('assets/logo_blanco.png') }}" alt="Shizen repartidor"></div>
-  <div class="welcome-text"><p class="welcome-title">Inicia sesión</p><p class="welcome-description">Ingresa tu correo electrónico</p></div>
-  @if ($errors->any())<p class="login-error">{{ $errors->first() }}</p>@endif
-  <form action="{{ route('login.submit') }}" method="post">
-    @csrf
-    <div class="input-container"><div class="input-box"><input name="email" type="email" placeholder="Correo electrónico" value="{{ old('email') }}" required></div></div>
-    <div class="input-container"><div class="input-box"><input name="password" type="password" placeholder="Contraseña" required></div></div>
-    <div class="button-container"><button type="submit" class="btn-green">Continuar</button></div>
-  </form>
-  <div class="create-account"><p>¿No tienes cuenta?<br><a href="{{ route('login') }}">Solicita acceso a Shizen</a></p></div>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+    <title>Shizen Repartidor — Iniciar sesión</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="{{ asset('pages/styles/login.css') }}?v=scale-1" />
+  </head>
+
+  <body>
+    <!-- Fondo superior -->
+    <div class="blob-wrap">
+      <svg
+        viewBox="0 0 375 332"
+        preserveAspectRatio="none"
+        class="blob"
+      >
+        <path
+          d="M0,0 L375,0 L375,220 C375,220 340,280 280,260 C220,240 180,290 120,270 C60,250 0,300 0,260 Z"
+          fill="#2d6a31"
+        />
+        <path
+          d="M310,268 C310,268 345,258 355,270 C365,282 348,292 335,285 C322,278 310,268 310,268 Z"
+          fill="#5cb85c"
+        />
+      </svg>
+    </div>
+
+    <!-- Logo -->
+    <div class="logo-container">
+      <img
+        src="{{ asset('assets/logo_blanco.png') }}"
+        alt="Shizen"
+        class="logo"
+      />
+    </div>
+
+    <!-- Título -->
+    <div class="welcome-text">
+      <p class="welcome-title">Inicia sesión</p>
+      <p class="welcome-description">
+        Ingresa tu correo electrónico
+      </p>
+    </div>
+
+    <!-- Formulario -->
+    <form action="{{ route('login.submit') }}" method="POST">
+      @csrf
+
+      <!-- Correo -->
+      <div class="input-container">
+        <div class="input-box">
+          <input
+            name="email"
+            type="email"
+            placeholder="Correo electrónico"
+            autocomplete="email"
+            maxlength="254"
+            value="{{ old('email') }}"
+            required
+          />
+        </div>
+      </div>
+
+      <!-- Contraseña -->
+      <div class="input-container">
+        <div class="input-box">
+          <input
+            name="password"
+            type="password"
+            placeholder="Contraseña"
+            autocomplete="current-password"
+            minlength="8"
+            maxlength="255"
+            required
+          />
+        </div>
+      </div>
+
+      @if ($errors->any())
+        <p id="login-error" style="color: #ef4444; font-size: 13px; text-align: center; margin-bottom: 12px; font-weight: 600;">
+          {{ $errors->first() }}
+        </p>
+      @endif
+
+      <!-- Botón -->
+      <div class="button-container">
+        <button
+          type="submit"
+          class="btn-green"
+          style="
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            border: none;
+            cursor: pointer;
+          "
+        >
+          Continuar
+        </button>
+      </div>
+    </form>
+
+    <!-- Crear cuenta -->
+    <div class="create-account">
+      <p>
+        ¿No tienes cuenta?
+        <br />
+        <a href="{{ rtrim(config('services.shizen.home_url'), '/') }}/registro-repartidor">
+          Crea una ahora y disfruta los beneficios
+        </a>
+      </p>
+    </div>
+  </body>
 </html>

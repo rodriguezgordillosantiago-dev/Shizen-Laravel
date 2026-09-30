@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>{{ $title ?? 'Shizen Repartidor' }}</title>
-  <link rel="stylesheet" href="{{ asset('css/repartidor.css') }}?v=scale-2">
+  <link rel="stylesheet" href="{{ asset('css/repartidor.css') }}?v=logout-button-2">
   <link rel="stylesheet" href="{{ asset('css/navigation.css') }}?v=scale-3">
   @stack('styles')
 </head>

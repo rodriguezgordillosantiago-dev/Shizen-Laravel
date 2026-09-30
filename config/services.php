@@ -35,4 +35,8 @@ return [
         ],
     ],
 
+    'shizen' => [
+        'home_url' => env('SHIZEN_HOME_URL', 'http://localhost/shizen-home/public'),
+    ],
+
 ];

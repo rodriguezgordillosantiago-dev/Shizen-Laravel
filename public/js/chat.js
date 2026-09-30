@@ -29,7 +29,7 @@ function initChat() {
       <!-- Header -->
       <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid rgba(0,0,0,.07)">
         <div style="display:flex;align-items:center;gap:10px">
-          <img src="/assets/logo-color.png" alt="Shizen" style="height:30px;width:80px;object-fit:contain">
+          <img src="../assets/logo-color.png" alt="Shizen" style="height:30px;width:80px;object-fit:contain">
           <div>
             <p style="margin:0;font-size:13px;font-weight:700;color:#1a1a1a">Soporte Shizen</p>
             <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:#22c55e;font-weight:600">
@@ -80,8 +80,8 @@ function renderMessages() {
       <div style="display:flex;justify-content:${isMe ? 'flex-end' : 'flex-start'}">
         <div style="max-width:75%;padding:8px 12px;border-radius:${isMe ? '16px 16px 4px 16px' : '16px 16px 16px 4px'};
           background:${isMe ? '#4c9540' : '#f1f1f1'};color:${isMe ? 'white' : '#1a1a1a'}">
-          <p style="margin:0;font-size:12px;line-height:1.4">${m.texto}</p>
-          <p style="margin:2px 0 0;font-size:9px;color:${isMe ? 'rgba(255,255,255,.6)' : '#9ca3af'}">${m.hora}</p>
+          <p style="margin:0;font-size:12px;line-height:1.4">${escapeHtml(m.texto)}</p>
+          <p style="margin:2px 0 0;font-size:9px;color:${isMe ? 'rgba(255,255,255,.6)' : '#9ca3af'}">${escapeHtml(m.hora)}</p>
         </div>
       </div>`;
   }).join('');
@@ -108,10 +108,4 @@ function sendMsg() {
   setMensajes(msgs);
   input.value = '';
   renderMessages();
-  setTimeout(() => {
-    const m2 = getMensajes();
-    m2.push({ id: Date.now() + 1, de: 'soporte', texto: 'Recibido, en breve te atendemos. ¡Gracias! 🙌', hora: nowTime() });
-    setMensajes(m2);
-    renderMessages();
-  }, 900);
 }

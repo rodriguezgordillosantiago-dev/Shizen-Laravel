@@ -11,14 +11,18 @@
   <div class="green-header" style="background:linear-gradient(135deg,#f0faf0,#ffffff);border-bottom:1px solid #c8e6c9;padding:38px 24px 28px;position:relative;text-align:center">
     <img src="{{ asset('assets/logo_color.png') }}" alt="Shizen" style="position:absolute;top:30px;right:24px;height:32px;object-fit:contain;opacity:0.9">
     <div class="profile-avatar" style="display:flex;flex-direction:column;align-items:center">
-      <div style="width:88px;height:88px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:12px;box-shadow:0 4px 16px rgba(0,0,0,0.15);font-size:32px;font-weight:bold;color:#4c9540">
-        {{ strtoupper(substr($repartidor['nombre'] ?? 'S', 0, 1) . substr($repartidor['apellido'] ?? 'V', 0, 1)) }}
+      <div style="width:88px;height:88px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:12px;box-shadow:0 4px 16px rgba(0,0,0,0.15);font-size:32px;font-weight:bold;color:#4c9540;overflow:hidden">
+        @if(!empty($repartidor['foto_url']))
+          <img src="{{ str_starts_with($repartidor['foto_url'], 'http') ? $repartidor['foto_url'] : asset($repartidor['foto_url']) }}" alt="Foto" style="width:100%;height:100%;object-fit:cover">
+        @else
+          {{ strtoupper(substr($repartidor['nombre'] ?? 'S', 0, 1) . substr($repartidor['apellido'] ?? 'V', 0, 1)) }}
+        @endif
       </div>
       <h1 style="color:#1b3a1d;font-size:22px;font-weight:700;margin:0 0 2px 0">
-        {{ $repartidor['nombre'] ?? 'Santiago' }} {{ $repartidor['apellido'] ?? 'Vargas' }}
+        {{ $repartidor['nombre'] ?? '' }} {{ $repartidor['apellido'] ?? '' }}
       </h1>
       <p style="color:#555;font-size:13px;margin:0">
-        {{ $repartidor['email'] ?? 'repartidor@shizen.test' }} · {{ $repartidor['vehiculo'] ?? 'Moto' }}
+        {{ $repartidor['email'] ?? '' }} · {{ $repartidor['vehiculo'] ?? '' }}
       </p>
       <div style="margin-top:12px;display:inline-flex;align-items:center;background:#e8f5e9;padding:4px 12px;border-radius:16px">
         <span style="width:8px;height:8px;background:#5cb85c;border-radius:50%;margin-right:6px"></span>
@@ -45,10 +49,44 @@
         <label class="field-group" style="display:block;margin-bottom:12px">
           <small style="display:block;margin-bottom:4px;color:#6b7280;font-size:13px">Nombre</small>
           <input id="campo-nombre" class="field" type="text" name="nombre" value="{{ $repartidor['nombre'] ?? '' }}" required readonly style="width:100%;padding:10px;border:1px solid #e5e7eb;border-radius:8px;background:#f9fafb;color:#374151;font-family:'Inter',sans-serif;font-size:15px;transition:all 0.2s">
+          <script>
+            (function () {
+              const field = document.currentScript.previousElementSibling;
+              const message = document.createElement('small');
+              message.className = 'field-error-inline';
+              message.style.cssText = 'display:block;color:#dc2626;font-size:12px;margin-top:6px';
+              field.insertAdjacentElement('afterend', message);
+              function validate() {
+                const valid = /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ .'-]{2,}$/.test(field.value.trim());
+                field.setCustomValidity(valid ? '' : 'Ingresa un nombre válido.');
+                message.textContent = field.dataset.touched === 'true' && !valid ? 'Ingresa un nombre válido.' : '';
+              }
+              field.addEventListener('input', function () { field.dataset.touched = 'true'; validate(); });
+              field.addEventListener('blur', function () { field.dataset.touched = 'true'; validate(); });
+              field.form.addEventListener('submit', function () { field.dataset.touched = 'true'; validate(); });
+            })();
+          </script>
         </label>
         <label class="field-group" style="display:block;margin-bottom:12px">
           <small style="display:block;margin-bottom:4px;color:#6b7280;font-size:13px">Apellido</small>
           <input id="campo-apellido" class="field" type="text" name="apellido" value="{{ $repartidor['apellido'] ?? '' }}" required readonly style="width:100%;padding:10px;border:1px solid #e5e7eb;border-radius:8px;background:#f9fafb;color:#374151;font-family:'Inter',sans-serif;font-size:15px;transition:all 0.2s">
+          <script>
+            (function () {
+              const field = document.currentScript.previousElementSibling;
+              const message = document.createElement('small');
+              message.className = 'field-error-inline';
+              message.style.cssText = 'display:block;color:#dc2626;font-size:12px;margin-top:6px';
+              field.insertAdjacentElement('afterend', message);
+              function validate() {
+                const valid = /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ .'-]{2,}$/.test(field.value.trim());
+                field.setCustomValidity(valid ? '' : 'Ingresa un apellido válido.');
+                message.textContent = field.dataset.touched === 'true' && !valid ? 'Ingresa un apellido válido.' : '';
+              }
+              field.addEventListener('input', function () { field.dataset.touched = 'true'; validate(); });
+              field.addEventListener('blur', function () { field.dataset.touched = 'true'; validate(); });
+              field.form.addEventListener('submit', function () { field.dataset.touched = 'true'; validate(); });
+            })();
+          </script>
         </label>
         <label class="field-group" style="display:block;margin-bottom:12px">
           <small style="display:block;margin-bottom:4px;color:#6b7280;font-size:13px">Correo electrónico (no editable)</small>
@@ -78,7 +116,7 @@
             <small style="display:block;color:#6b7280;font-size:11px;font-weight:600">Tipo de vehículo registrado</small>
             <span style="font-size:15px;font-weight:700;color:#0f172a">
               @php
-                $v = $repartidor['vehiculo'] ?? 'Moto';
+                $v = $repartidor['vehiculo'] ?? '';
                 $emoji = match(strtolower($v)) {
                   'moto' => '🏍️',
                   'bicicleta' => '🚲',
@@ -123,7 +161,7 @@
           </svg>
           <p style="font-size:14px;font-weight:600;margin:0">Entregas hoy</p>
         </div>
-        <span style="font-size:15px;font-weight:700;color:#4c9540" id="profile-entregas-count">6</span>
+        <span style="font-size:15px;font-weight:700;color:#4c9540" id="profile-entregas-count">{{ $entregasHoy ?? 0 }}</span>
       </div>
 
       <!-- Ganancias -->
@@ -135,7 +173,7 @@
           </svg>
           <p style="font-size:14px;font-weight:600;margin:0">Ganancias</p>
         </div>
-        <span style="font-size:15px;font-weight:700;color:#4c9540" id="profile-ganancias-count">$25.800</span>
+        <span style="font-size:15px;font-weight:700;color:#4c9540" id="profile-ganancias-count">{{ $gananciasHoy ?? '$0' }}</span>
       </div>
 
       <!-- Configuración link -->
@@ -158,8 +196,8 @@
   <div style="padding:20px 16px 32px">
     <form action="{{ route('logout') }}" method="post">
       @csrf
-      <button type="submit" style="display:flex;align-items:center;justify-content:center;background:#fff;border:1px solid #fee2e2;color:#ef4444;padding:12px;border-radius:10px;font-weight:700;cursor:pointer;width:100%;font-family:'Inter',sans-serif;font-size:15px">
-        Cerrar sesión
+      <button type="submit" style="display:flex;align-items:center;justify-content:center;gap:6px;background:#fff;border:1px solid #fee2e2;color:#ef4444;padding:12px;border-radius:10px;font-weight:700;cursor:pointer;width:100%;font-family:&#39;Inter&#39;,sans-serif;font-size:15px">
+        <svg class="logout-icon" width="18" height="18" fill="currentColor" viewBox="0 0 512 512" aria-hidden="true"><path d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z"></path></svg> Cerrar sesión
       </button>
     </form>
   </div>
