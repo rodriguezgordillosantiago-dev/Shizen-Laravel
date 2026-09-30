@@ -32,15 +32,7 @@
         @forelse ($products as $p)
             @php
                 $hasPromo = !empty($p->on_promo);
-                $rawImg = $p->imagen_url ?? '';
-                if (str_contains($rawImg, 'Imagenes_prueba/')) {
-                    $file = basename($rawImg);
-                    $imgUrl = '/shizen-home/public/images/catalogo/Imagenes_prueba/' . $file;
-                } elseif (!empty($rawImg)) {
-                    $imgUrl = $rawImg;
-                } else {
-                    $imgUrl = 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400';
-                }
+                $imgUrl = $p->imagen_display_url;
             @endphp
             <div class="product-card"
                  data-name="{{ strtolower(($p->nombre ?? '') . ' ' . ($p->descripcion ?? '')) }}"
@@ -97,7 +89,7 @@
                             </button>
 
                             {{-- Botón Eliminar --}}
-                            <form method="post" action="{{ route('business.products.delete', $p->id_menu_item) }}" onsubmit="return confirm('¿Eliminar producto {{ $p->nombre }}?')" style="display:inline">
+                            <form method="post" action="{{ route('business.products.delete', $p->id_menu_item) }}" onsubmit="return confirm('¿Eliminar este producto?')" style="display:inline">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-danger btn-sm" style="padding:6px 8px">
@@ -265,9 +257,6 @@
         const wrap = document.getElementById('imgPreviewWrap');
         const img  = document.getElementById('imgPreview');
         if (url) {
-            if (url.includes('Imagenes_prueba/')) {
-                url = '/shizen-home/public/images/catalogo/Imagenes_prueba/' + url.split('Imagenes_prueba/').pop();
-            }
             img.src = url;
             wrap.style.display = 'block';
         } else {
@@ -286,8 +275,8 @@
         document.getElementById('prodCategory').value = p.id_categoria || '';
         document.getElementById('prodPrecio').value = p.precio || '';
         document.getElementById('prodStock').value = p.stock || 0;
-        document.getElementById('prodImagenUrl').value = p.imagen_url || '';
-        setImgPreview(p.imagen_url || '');
+        document.getElementById('prodImagenUrl').value = '';
+        setImgPreview(p.imagen_display_url || '');
         document.getElementById('prodImagen').value = '';
 
         const precio = parseFloat(p.precio) || 0;
@@ -323,6 +312,109 @@
 
     document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('prodPrecio').addEventListener('input', calcPromoPrice);
+
+        const form = document.getElementById('productForm');
+        if (!form) return;
+
+        const nombre    = document.getElementById('prodNombre');
+        const categoria = document.getElementById('prodCategory');
+        const precio    = document.getElementById('prodPrecio');
+        const stock     = document.getElementById('prodStock');
+        const imagen    = document.getElementById('prodImagen');
+
+        function ensureError(field) {
+            const wrapper = field.closest('.form-group');
+            if (!wrapper) return null;
+            let msg = wrapper.querySelector('.field-error');
+            if (!msg) {
+                msg = document.createElement('small');
+                msg.className = 'field-error';
+                msg.style.cssText = 'display:block;color:#c62828;font-size:12px;margin-top:6px';
+                wrapper.appendChild(msg);
+            }
+            return msg;
+        }
+
+        function validateNombre() {
+            const msg = ensureError(nombre);
+            const valid = nombre.value.trim().length >= 2;
+            nombre.setCustomValidity(valid ? '' : 'Ingresa un nombre de producto válido.');
+            if (msg) msg.textContent = nombre.dataset.touched === 'true' && !valid ? 'Ingresa un nombre de producto válido.' : '';
+            return valid;
+        }
+
+        function validateCategoria() {
+            const msg = ensureError(categoria);
+            const valid = categoria.value.trim() !== '';
+            categoria.setCustomValidity(valid ? '' : 'Selecciona una categoría.');
+            if (msg) msg.textContent = categoria.dataset.touched === 'true' && !valid ? 'Selecciona una categoría.' : '';
+            return valid;
+        }
+
+        function validatePrecio() {
+            const msg = ensureError(precio);
+            const value = Number(precio.value);
+            const valid = precio.value !== '' && Number.isFinite(value) && value >= 1000 && value % 50 === 0;
+            precio.setCustomValidity(valid ? '' : 'El precio debe ser mínimo $1.000 y múltiplo de 50.');
+            if (msg) msg.textContent = precio.dataset.touched === 'true' && !valid ? 'El precio debe ser mínimo $1.000 y múltiplo de 50.' : '';
+            return valid;
+        }
+
+        function validateStock() {
+            const msg = ensureError(stock);
+            const value = Number(stock.value);
+            const valid = stock.value !== '' && Number.isInteger(value) && value >= 0;
+            stock.setCustomValidity(valid ? '' : 'El stock debe ser un número igual o mayor a 0.');
+            if (msg) msg.textContent = stock.dataset.touched === 'true' && !valid ? 'El stock debe ser un número igual o mayor a 0.' : '';
+            return valid;
+        }
+
+        function validateImagen() {
+            const wrapper = imagen.closest('.form-group');
+            let msg = wrapper ? wrapper.querySelector('.field-error-imagen') : null;
+            if (!msg && wrapper) {
+                msg = document.createElement('small');
+                msg.className = 'field-error-imagen';
+                msg.style.cssText = 'display:block;color:#c62828;font-size:12px;margin-top:6px';
+                wrapper.appendChild(msg);
+            }
+            if (!imagen.files || !imagen.files[0]) { if (msg) msg.textContent = ''; return true; }
+            const file = imagen.files[0];
+            const valid = ['image/jpeg','image/png','image/webp','image/gif'].includes(file.type) && file.size <= 5 * 1024 * 1024;
+            if (msg) msg.textContent = valid ? '' : 'La imagen debe ser JPG, PNG, WEBP o GIF y pesar máximo 5 MB.';
+            imagen.setCustomValidity(valid ? '' : 'La imagen debe ser JPG, PNG, WEBP o GIF y pesar máximo 5 MB.');
+            return valid;
+        }
+
+        [nombre, categoria, precio, stock].forEach(function(field) {
+            ['input','blur','change'].forEach(function(evt) {
+                field.addEventListener(evt, function() {
+                    field.dataset.touched = 'true';
+                    if (field === nombre)    validateNombre();
+                    if (field === categoria) validateCategoria();
+                    if (field === precio)    validatePrecio();
+                    if (field === stock)     validateStock();
+                });
+            });
+        });
+
+        imagen.addEventListener('change', function() {
+            imagen.dataset.touched = 'true';
+            validateImagen();
+        });
+
+        form.addEventListener('submit', function(event) {
+            nombre.dataset.touched = 'true';
+            categoria.dataset.touched = 'true';
+            precio.dataset.touched = 'true';
+            stock.dataset.touched = 'true';
+            const ok = validateNombre() && validateCategoria() && validatePrecio() && validateStock() && validateImagen();
+            if (!ok) {
+                event.preventDefault();
+                const firstInvalid = form.querySelector(':invalid');
+                if (firstInvalid) firstInvalid.focus();
+            }
+        });
     });
     </script>
 </x-business-layout>

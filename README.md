@@ -57,3 +57,9 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+## Shizen Negocio
+
+The business dashboard is served by Laravel routes and Blade views. Configure its database connection to the shared `shizen` MySQL database before use; business access requires a user with role `negocio` and a matching row in `negocios`. Business registration continues in the Shizen Home Laravel app at the URL configured by `SHIZEN_HOME_URL`. Product and logo uploads are validated and stored under this app's `public/assets/Imagenes_prueba` directory.
+
+For local XAMPP, copy `.env.example` to `.env`, set the MySQL credentials, and generate an app key with `php artisan key:generate`. Point Apache at `public/`. Run the business route and authentication checks with `php artisan test`.
