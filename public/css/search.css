@@ -1,4 +1,5 @@
 .search-page { max-width: 1000px; margin: 0 auto; padding: 55px 22px; }
+.search-back { margin-bottom: 22px; cursor: pointer; }
 .search-page h1 { color: #1b3a1d; font-size: 2rem; }
 .search-page-sub { color: #68756a; margin: 10px 0 28px; }
 .search-section-title { color: #2d6a31; font-size: 1.15rem; margin: 24px 0 12px; }

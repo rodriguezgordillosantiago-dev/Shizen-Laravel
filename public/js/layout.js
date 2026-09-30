@@ -1,12 +1,15 @@
 /* Carga los bloques de interfaz para mantener cada vista editable de forma aislada.
-   Navegacion ya es incluida por PHP (index.php / forms/*.php), no por fetch. */
-var layoutSections = [["overlays", "forms/modales.php"]];
+   En index.php la navegación ya viene incluida; index.html la carga aquí. */
+var layoutSections = [
+  ["navigation", "forms/navegacion.php"],
+  ["overlays", "forms/modales.php"],
+];
 
 var appContent = document.getElementById("app-content");
 if (appContent && !appContent.innerHTML.trim()) {
   layoutSections.splice(0, 0, [
     "app-content",
-    "forms/home.html",
+    "forms/home.php",
   ]);
 }
 

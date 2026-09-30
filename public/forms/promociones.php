@@ -17,14 +17,14 @@
 
   <!-- Componente de navegación reutilizable -->
   <header id="navigation">
-    <?php include __DIR__ . '/navegacion.html'; ?>
+    <?php include __DIR__ . '/navegacion.php'; ?>
   </header>
 
   <main id="app-content">
     <section class="promos-page">
 
       <div class="page-header">
-        <a class="btn-back" href="index.php" aria-label="Volver">
+        <a class="btn-back back-link" href="index.php" aria-label="Volver">
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="M19 12H5M12 19l-7-7 7-7" />
           </svg>
@@ -36,28 +36,8 @@
       </div>
 
       <div class="promos-inner">
-        <div class="promos-grid">
-
-          <?php if (empty($promociones)): ?>
-            <p class="promos-empty">No hay promociones activas en este momento.</p>
-          <?php else: ?>
-            <?php foreach ($promociones as $promo): ?>
-              <div class="promo-card">
-                <div class="promo-card-img" style="background-image: url('<?= htmlspecialchars($promo['imagen_url'] ?: 'assets/image-6.png') ?>')">
-                  <span class="promo-badge">Oferta</span>
-                  <span class="promo-tag-top">Destacado</span>
-                </div>
-                <div class="promo-card-body">
-                  <h3>🌱 <?= htmlspecialchars($promo['promo_nombre']) ?></h3>
-                  <div class="promo-restaurant">🏪 <?= htmlspecialchars($promo['negocio_nombre']) ?></div>
-                  <p class="promo-desc"><?= htmlspecialchars($promo['promo_desc']) ?></p>
-                  <a class="btn-view-dishes" href="php/categorias.php">Ver platos</a>
-                </div>
-              </div>
-            <?php endforeach; ?>
-          <?php endif; ?>
-
-        </div>
+        <div class="filter-tabs" id="promoFilterTabs"></div>
+        <div class="promos-grid" id="promosGrid"></div>
       </div>
 
     </section>
@@ -68,10 +48,10 @@
     <?php include __DIR__ . '/modales.php'; ?>
   </div>
 
-  <script src="js/data.js"></script>
   <script>
     window.shizenLayoutReady = Promise.resolve();
+    window.DB_PROMOS = <?= json_encode($promociones ?? [], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>;
   </script>
-  <script src="js/app.js"></script>
+  <script src="js/app.js?v=20260924-1"></script>
 </body>
 </html>

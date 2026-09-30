@@ -36,19 +36,34 @@
       <h2 class="search-section-title">Platos</h2>
       <div class="search-results">
         @foreach ($dishes as $dish)
-          <a class="search-result-card" href="{{ url('/categorias') }}?categoria={{ $dish->categoria_id }}">
-            <img class="search-result-image" src="{{ $dish->imagen_url }}" alt="" loading="lazy" decoding="async">
-            <span class="search-result-content">
-              <strong>{{ $dish->nombre }}</strong>
-              <small>{{ $dish->negocio_nombre ?: 'Restaurante Shizen' }} · ${{ number_format((float) $dish->precio, 0, ',', '.') }}</small>
-              <em>{{ $dish->descripcion ?: 'Plato vegano de Shizen.' }}</em>
-            </span>
-          </a>
+          @php
+            $hasPromo = !empty($dish->on_promo) && (float) $dish->precio_promocion > 0;
+            $cartDish = [
+              'id' => (int) $dish->id,
+              'name' => $dish->nombre,
+              'price' => $hasPromo ? (float) $dish->precio_promocion : (float) $dish->precio,
+              'restaurant' => $dish->negocio_nombre ?: 'Restaurante Shizen',
+              'businessId' => (int) ($dish->negocio_id ?? 0),
+              'image' => $dish->imagen_url,
+            ];
+          @endphp
+          <article class="search-result-card">
+            <a class="search-result-content" href="{{ url('/categorias') }}?categoria={{ $dish->categoria_id ?: 1 }}">
+              <img class="search-result-image" src="{{ $dish->imagen_url }}" alt="" loading="lazy" decoding="async">
+              <span>
+                <strong>{{ $dish->nombre }}</strong>
+                <small>{{ $dish->negocio_nombre ?: 'Restaurante Shizen' }} · ${{ number_format($cartDish['price'], 0, ',', '.') }}</small>
+                <em>{{ $dish->descripcion ?: 'Plato vegano de Shizen.' }}</em>
+              </span>
+            </a>
+            <button class="btn-add-cart" type="button" onclick='addToCart(<?= e(json_encode($cartDish, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP)) ?>)'>Añadir al carrito</button>
+          </article>
         @endforeach
       </div>
       @endif
     @endif
   </main>
+  <div id="overlays">@include('modales')</div>
   <script src="{{ asset('js/app.js') }}"></script>
 </body>
 </html>

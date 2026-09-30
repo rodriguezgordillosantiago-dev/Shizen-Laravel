@@ -88,24 +88,44 @@
       </p>
       <h3 class="category-subtitle">Categorías</h3>
       <p class="category-section-text">Elige una categoría y descubre lo mejor de la cocina vegana colombiana.</p>
-      <div
-        class="category-scroll"
-        id="categoryScroll"
-      ></div>
+      @php
+        $categoryThemes = ['card-comidas', 'card-cenas', 'card-bowls', 'card-postres', 'card-bebidas', 'card-desayunos', 'card-todos'];
+        $categorySpotlights = ['rgba(255,100,0,.40)', 'rgba(168,0,255,.38)', 'rgba(0,180,216,.38)', 'rgba(247,37,133,.40)', 'rgba(0,100,255,.38)', 'rgba(255,160,0,.40)', 'rgba(99,102,241,.35)'];
+      @endphp
+      <div class="filter-section">
+        <div class="filter-track-wrapper">
+          <div class="filter-track" id="filterTrack" role="region" aria-label="Categorías de platos">
+            @forelse ($categories as $index => $category)
+              <a class="filter-card {{ $categoryThemes[$index % count($categoryThemes)] }}" href="{{ route('categories', ['categoria' => $category->id_categoria]) }}" aria-label="Ver {{ $category->platos_count }} platos de {{ $category->nombre }}">
+                <span class="card-ring" aria-hidden="true"></span>
+                <span class="card-count"><span>{{ $category->platos_count }}</span></span>
+                <span class="card-emoji-area">
+                  <span class="card-spotlight" style="background:{{ $categorySpotlights[$index % count($categorySpotlights)] }}" aria-hidden="true"></span>
+                  <span class="card-emoji">{{ $category->icon ?: '🥗' }}</span>
+                </span>
+                <span class="card-bottom">
+                  <span class="card-label">{{ $category->nombre }}</span>
+                  <span class="card-pill">Ver platos</span>
+                </span>
+              </a>
+            @empty
+              <p class="cat-empty">No hay categorías disponibles todavía.</p>
+            @endforelse
+          </div>
+        </div>
+      </div>
       <div class="business-inline" aria-labelledby="business-band-title">
         <h3 id="business-band-title">Negocios mejor calificados</h3>
         <p class="business-band-sub">Descubre los favoritos de nuestra comunidad.</p>
         <div class="business-scroll">
           @forelse ($businesses as $business)
-            <article class="business-card">
-              <a class="business-card-link" href="{{ route('business.menu', $business->id) }}">
-                <img src="{{ $business->logo_url }}" alt="Logo de {{ $business->nombre }}" loading="lazy" decoding="async">
-                <span class="business-card-info">
-                  <strong>{{ $business->nombre }}</strong>
-                  <span class="business-rating">★ {{ number_format($business->rating, 1) }}</span>
-                </span>
-              </a>
-            </article>
+            <a class="business-card" href="{{ route('business.menu', $business->id) }}">
+              <img src="{{ $business->logo_url }}" alt="Logo de {{ $business->nombre }}" loading="lazy" decoding="async">
+              <span class="business-card-info">
+                <strong>{{ $business->nombre }}</strong>
+                <span class="business-rating">★ {{ $business->rating > 0 ? number_format($business->rating, 1) : 'Nuevo' }}</span>
+              </span>
+            </a>
           @empty
             <p>No hay negocios disponibles todavía.</p>
           @endforelse

@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    'shizen' => [
+        'business_url' => env('SHIZEN_NEGOCIO_URL', 'http://localhost/shizen-negocio/public'),
+        'courier_url' => env('SHIZEN_REPARTIDOR_URL', 'http://localhost/shizen-repartidor/public'),
+    ],
+
 ];

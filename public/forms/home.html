@@ -86,10 +86,30 @@
         Elige una categoría y descubre lo mejor de la cocina
         vegana colombiana.
       </p>
-      <div
-        class="category-scroll"
-        id="categoryScroll"
-      ></div>
+      <div class="category-scroll" id="categoryScroll">
+        <?php require_once __DIR__ .
+        '/../clases/Categoria.php'; $allCategories = []; try
+        { $allCategories = Categoria::obtenerTodas(); }
+        catch (Throwable $e) { $allCategories = []; }
+        $catBgs = ['#fff8e1', '#ede9fe', '#dcfce7',
+        '#fce7f3', '#dbeafe', '#fef9c3', '#f0fdf4']; foreach
+        ($allCategories as $idx => $cat): $catId =
+        (int)($cat['id_categoria'] ?? $cat['id'] ?? 1);
+        $catName = htmlspecialchars($cat['nombre'] ??
+        'Categoría', ENT_QUOTES, 'UTF-8'); $catIcon =
+        htmlspecialchars($cat['icon'] ?? '🥗', ENT_QUOTES,
+        'UTF-8'); $bg = $catBgs[$idx % count($catBgs)]; ?>
+        <a
+          class="cat-card"
+          href="php/categorias.php?categoria=<?= $catId ?>"
+          style="background: <?= $bg ?>"
+        >
+          <div class="cat-emoji-wrap"><?= $catIcon ?></div>
+          <div class="cat-label"><?= $catName ?></div>
+          <div class="cat-pill">Ver platos</div>
+        </a>
+        <?php endforeach; ?>
+      </div>
     </div>
   </section>
   <section class="join-section" id="registro" tabindex="-1">

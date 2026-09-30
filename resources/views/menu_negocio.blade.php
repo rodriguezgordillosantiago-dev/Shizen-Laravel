@@ -45,14 +45,16 @@
               <span class="dish-promo-badge" style="position:absolute;top:10px;left:10px;background:#ea580c;color:#fff;font-weight:700;padding:4px 8px;border-radius:6px;font-size:11px;box-shadow:0 2px 6px rgba(234,88,12,.5)">🔥 PROMOCIÓN</span>
             @endif
             @if (session('auth_user'))
-              <form method="post" action="{{ route('business.favorite', $business->id) }}" class="dish-favorite-form">
+              <form method="post" action="{{ route('favorites.toggle') }}" class="dish-favorite-form">
                 @csrf
-                <button class="favorite-button dish-favorite-button {{ $business->is_favorite ? 'is-favorite' : '' }}" type="submit" aria-label="{{ $business->is_favorite ? 'Quitar restaurante de favoritos' : 'Agregar restaurante a favoritos' }}">
-                  {{ $business->is_favorite ? '♥' : '♡' }}
+                <input type="hidden" name="id_menu_item" value="{{ $dish->id }}">
+                <input type="hidden" name="redirect" value="{{ request()->getRequestUri() }}">
+                <button class="favorite-button dish-favorite-button {{ $dish->is_favorite ? 'is-favorite' : '' }}" type="submit" aria-label="{{ $dish->is_favorite ? 'Quitar plato de favoritos' : 'Agregar plato a favoritos' }}">
+                  {{ $dish->is_favorite ? '♥' : '♡' }}
                 </button>
               </form>
             @else
-              <a class="favorite-button dish-favorite-button" href="{{ route('login', ['redirect' => request()->getRequestUri()]) }}" aria-label="Inicia sesión para agregar el restaurante a favoritos" title="Inicia sesión para agregar el restaurante a favoritos">♡</a>
+              <a class="favorite-button dish-favorite-button" href="{{ url('/login?redirect=' . urlencode(request()->getRequestUri())) }}" aria-label="Inicia sesión para agregar el plato a favoritos" title="Inicia sesión para agregar el plato a favoritos">♡</a>
             @endif
           </div>
           <div class="dish-body">

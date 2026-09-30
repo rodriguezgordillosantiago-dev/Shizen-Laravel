@@ -211,19 +211,6 @@
 .btn-modal-secondary:hover {
   background: #f0faf0;
 }
-.offer-warning {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: #fff8e1;
-  border: 1px solid #ffe082;
-  border-radius: 8px;
-  padding: 9px 12px;
-  font-size: 13px;
-  color: #f57f17;
-  font-weight: 600;
-  margin-top: 14px;
-}
 .cart-card,
 .checkout-card {
   max-width: 520px;

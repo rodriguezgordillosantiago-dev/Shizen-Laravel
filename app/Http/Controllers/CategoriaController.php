@@ -29,21 +29,28 @@ class CategoriaController extends Controller
                 'm.imagen_url',
                 'm.on_promo',
                 'm.precio_promocion',
+                'm.id_negocio',
                 'n.id_negocio as negocio_id',
                 DB::raw("COALESCE(n.nombre, 'Restaurante Shizen') as negocio_nombre"),
             ])
             ->get()
             ->map(function ($dish) {
                 $dish->imagen_url = ImageUrl::resolve($dish->imagen_url);
-                $authUser = session('auth_user');
-                $dish->is_favorite = $authUser && $dish->negocio_id
-                    ? DB::table('favorito')
-                        ->where('id_usuario', $authUser['id_usuario'])
-                        ->where('id_negocio', $dish->negocio_id)
-                        ->exists()
-                    : false;
                 return $dish;
             });
+
+        $authUser = $request->session()->get('auth_user');
+        $favoriteDishIds = $authUser
+            ? DB::table('favorito')
+                ->where('id_usuario', $authUser['id_usuario'])
+                ->whereIn('id_menu_item', $dishes->pluck('id'))
+                ->pluck('id_menu_item')
+                ->map(fn ($id): int => (int) $id)
+                ->all()
+            : [];
+        $dishes->each(function ($dish) use ($favoriteDishIds): void {
+            $dish->is_favorite = in_array((int) $dish->id, $favoriteDishIds, true);
+        });
 
         $category->cover_img = ImageUrl::resolve($category->cover_img);
 

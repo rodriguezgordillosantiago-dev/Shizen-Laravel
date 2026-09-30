@@ -2,11 +2,16 @@
 declare(strict_types=1);
 
 if (session_status() === PHP_SESSION_NONE) {
+    session_name('SHIZEN_CLIENTE_SESSION');
     session_start();
+}
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
 require_once __DIR__ . '/../clases/Categoria.php';
 require_once __DIR__ . '/../clases/Plato.php';
+require_once __DIR__ . '/../funciones/funciones.php';
 
 $rawCategoria = $_GET['categoria'] ?? '';
 $categoria = null;
@@ -27,4 +32,3 @@ try {
 
 include __DIR__ . '/../forms/categorias.php';
 ?>
-

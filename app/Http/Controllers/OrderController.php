@@ -25,9 +25,13 @@ class OrderController extends Controller
         $user = $this->user($request);
         $data = $request->validate([
             'items' => ['required', 'json'],
+            'nombre' => ['required', 'string', 'max:60'],
+            'apellido' => ['required', 'string', 'max:60'],
+            'numero_documento' => ['required', 'digits_between:5,20'],
+            'correo' => ['required', 'email', 'max:120'],
             'direccion' => ['required', 'string', 'max:255'],
             'localidad' => ['nullable', 'string', 'max:100'],
-            'metodo_pago' => ['required', 'string', 'max:30'],
+            'metodo_pago' => ['required', 'in:Contraentrega,Transferencia,Nequi,Daviplata'],
         ]);
         $items = json_decode($data['items'], true);
         if (!is_array($items) || !$items) {
@@ -40,7 +44,11 @@ class OrderController extends Controller
             return back()->withErrors(['items' => $exception->getMessage()]);
         }
 
-        return redirect()->route('orders.show', $orderId)->with('order_created', true);
+        $orderedItemIds = collect($items)->pluck('id')->map(fn ($id): int => (int) $id)->unique()->values();
+
+        return redirect()->route('orders.show', $orderId)
+            ->with('order_created', true)
+            ->with('ordered_item_ids', $orderedItemIds);
     }
 
     public function show(Request $request, int $orderId)
@@ -49,8 +57,9 @@ class OrderController extends Controller
         $order = $this->pedidos->findForUser($user['id_usuario'], $orderId);
         abort_unless($order, 404);
         $rated = $this->pedidos->isRated($user['id_usuario'], $orderId);
+        $businessRated = $this->pedidos->isBusinessRated($user['id_usuario'], (int) $order->id_negocio);
 
-        return view('pedido_detalle', compact('order', 'rated'));
+        return view('pedido_detalle', compact('order', 'rated', 'businessRated'));
     }
 
     public function confirm(Request $request, int $orderId)
@@ -76,6 +85,50 @@ class OrderController extends Controller
         ), 404);
 
         return back()->with('order_success', 'Gracias por calificar tu entrega.');
+    }
+
+    public function rateBusiness(Request $request, int $orderId)
+    {
+        $user = $this->user($request);
+        $data = $request->validate([
+            'puntuacion' => ['required', 'integer', 'between:1,5'],
+            'comentario' => ['nullable', 'string', 'max:500'],
+        ]);
+
+        abort_unless($this->pedidos->rateBusiness(
+            $user['id_usuario'],
+            $orderId,
+            $data['puntuacion'],
+            $data['comentario'] ?? null
+        ), 404);
+
+        return back()->with('order_success', 'Gracias por calificar el negocio.');
+    }
+
+    public function legacyConfirm(Request $request)
+    {
+        $data = $request->validate([
+            'id' => ['required', 'integer', 'min:1'],
+            'codigo' => ['required_without:codigo_entrega', 'digits:6'],
+            'codigo_entrega' => ['required_without:codigo', 'digits:6'],
+        ]);
+        $request->merge(['codigo' => $data['codigo'] ?? $data['codigo_entrega']]);
+
+        return $this->confirm($request, (int) $data['id']);
+    }
+
+    public function legacyRate(Request $request)
+    {
+        $data = $request->validate(['id' => ['required', 'integer', 'min:1']]);
+
+        return $this->rate($request, (int) $data['id']);
+    }
+
+    public function legacyRateBusiness(Request $request)
+    {
+        $data = $request->validate(['id' => ['required', 'integer', 'min:1']]);
+
+        return $this->rateBusiness($request, (int) $data['id']);
     }
 
     private function user(Request $request): array

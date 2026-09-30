@@ -24,9 +24,10 @@
     <link rel="stylesheet" href="css/styles.css" />
     <link
       rel="stylesheet"
-      href="css/nav.css?v=20260905-1"
+      href="css/nav.css?v=20260929-logout-2"
     />
     <link rel="stylesheet" href="css/home.css" />
+    <link rel="stylesheet" href="{{ asset('css/catalog.css') }}" />
     <link
       rel="stylesheet"
       href="css/pages.css?v=20260816-1"

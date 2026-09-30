@@ -19,7 +19,7 @@ if (empty($_SESSION['csrf_token'])) {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="css/styles.css" />
-    <link rel="stylesheet" href="css/nav.css?v=20260905-2" />
+    <link rel="stylesheet" href="css/nav.css?v=20260929-logout-2" />
     <link rel="stylesheet" href="css/home.css" />
     <link rel="stylesheet" href="css/pages.css?v=20260816-1" />
     <link rel="stylesheet" href="css/registro_base.css" />

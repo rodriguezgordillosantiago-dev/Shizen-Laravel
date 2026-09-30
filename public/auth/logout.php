@@ -2,7 +2,22 @@
 declare(strict_types=1);
 
 if (session_status() === PHP_SESSION_NONE) {
+    session_name('SHIZEN_CLIENTE_SESSION');
     session_start();
+}
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_name('SHIZEN_CLIENTE_SESSION');
+    session_start();
+}
+
+if (
+    $_SERVER['REQUEST_METHOD'] !== 'POST'
+    || empty($_SESSION['csrf_token'])
+    || !hash_equals($_SESSION['csrf_token'], (string) ($_POST['csrf_token'] ?? ''))
+) {
+    http_response_code(403);
+    exit('Solicitud no válida.');
 }
 
 $_SESSION = [];

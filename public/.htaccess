@@ -23,15 +23,12 @@
     RewriteCond %{HTTP:x-xsrf-token} .
     RewriteRule .* - [E=HTTP_X_XSRF_TOKEN:%{HTTP:X-XSRF-Token}]
 
-    # Send legacy PHP registration URLs through Laravel instead of executing
-    # the obsolete files under public/php.
-    RewriteRule ^php/registro_usuario\.php$ index.php [L]
-    RewriteRule ^php/registro_negocio\.php$ index.php [L]
-    RewriteRule ^php/registro_repartidor\.php$ index.php [L]
-    RewriteRule ^php/categorias\.php$ index.php [L]
-    RewriteRule ^php/promociones\.php$ index.php [L]
-    RewriteRule ^php/login\.php$ index.php [L]
-    RewriteRule ^auth/login\.php$ index.php [L]
+    # Preserve Laravel's front controller and route every copied PHP endpoint
+    # through the application instead of executing legacy files from public.
+    RewriteRule ^index\.php$ - [L]
+    RewriteRule ^.+\.php$ index.php [L,QSA]
+    RewriteRule ^index\.html$ index.php [L,QSA]
+    RewriteRule ^(forms|pages)/.+\.html$ index.php [L,QSA]
 
     # Redirect Trailing Slashes If Not A Folder...
     RewriteCond %{REQUEST_FILENAME} !-d

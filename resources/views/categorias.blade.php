@@ -30,7 +30,7 @@
       </div>
       <div class="cat-filter-bar">
         <span>Ordenar por:</span>
-        <select class="sort-select"><option>Relevancia</option><option>Precio: menor</option><option>Precio: mayor</option></select>
+        <select class="sort-select"><option>Relevancia</option><option>Precio: menor</option><option>Precio: mayor</option></select><script>(function(c){if(!c||c.dataset.validacionCampo)return;c.dataset.validacionCampo='1';var e=c.nextElementSibling&&c.nextElementSibling.classList.contains('field-error-inline')?c.nextElementSibling:document.createElement('small');e.className='field-error-inline';e.style.cssText='display:block;color:#c62828;font-size:12px;margin-top:4px;min-height:1em;';if(!e.parentNode)c.insertAdjacentElement('afterend',e);function v(){var x=c.required&&!c.value.trim(),i=x||!c.validity.valid;e.textContent=i?(x?'Este campo es obligatorio.':c.validationMessage):'';c.setAttribute('aria-invalid',i?'true':'false');return!i}['input','change','blur'].forEach(function(t){c.addEventListener(t,v)});if(c.form)c.form.addEventListener('submit',function(a){if(!v())a.preventDefault()})})(document.currentScript.previousElementSibling);</script>
       </div>
       <div class="cat-items-inner">
         <div class="items-grid" id="itemsGrid">
@@ -48,14 +48,16 @@
                 @endif
                 @if ($dish->negocio_id)
                   @if (session('auth_user'))
-                    <form method="post" action="{{ route('business.favorite', $dish->negocio_id) }}" class="dish-favorite-form">
+                    <form method="post" action="{{ route('favorites.toggle') }}" class="dish-favorite-form">
                       @csrf
-                      <button class="favorite-button dish-favorite-button {{ $dish->is_favorite ? 'is-favorite' : '' }}" type="submit" aria-label="{{ $dish->is_favorite ? 'Quitar restaurante de favoritos' : 'Agregar restaurante a favoritos' }}">
+                      <input type="hidden" name="id_menu_item" value="{{ $dish->id }}">
+                      <input type="hidden" name="redirect" value="{{ request()->getRequestUri() }}">
+                      <button class="favorite-button dish-favorite-button {{ $dish->is_favorite ? 'is-favorite' : '' }}" type="submit" aria-label="{{ $dish->is_favorite ? 'Quitar plato de favoritos' : 'Agregar plato a favoritos' }}">
                         {{ $dish->is_favorite ? '♥' : '♡' }}
                       </button>
                     </form>
                   @else
-                    <a class="favorite-button dish-favorite-button" href="{{ route('login', ['redirect' => request()->getRequestUri()]) }}" aria-label="Inicia sesión para agregar el restaurante a favoritos" title="Inicia sesión para agregar el restaurante a favoritos">♡</a>
+                    <a class="favorite-button dish-favorite-button" href="{{ url('/login?redirect=' . urlencode(request()->getRequestUri())) }}" aria-label="Inicia sesión para agregar el plato a favoritos" title="Inicia sesión para agregar el plato a favoritos">♡</a>
                   @endif
                 @endif
               </div>

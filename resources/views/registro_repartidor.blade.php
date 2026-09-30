@@ -107,108 +107,141 @@
           <br />
           <div class="form-group">
             <label> Nombre </label>
-            <input
-              class="form-input"
-              type="text"
-              name="nombre"
-              placeholder="Tu nombre"
-              pattern="[A-Za-zÁÉÍÓÚÜÑáéíóúüñ .'\-]{2,}"
-              title="Ingresa tu nombre completo."
-              required
-            />
+            <input class="form-input" type="text" name="nombre" placeholder="Tu nombre" pattern="[A-Za-zÁÉÍÓÚÜÑáéíóúüñ .'-]{2,}" title="Ingresa tu nombre completo." required />
+            <script>
+              (function (c) {
+                if (!c || c.dataset.validacionCampo) return; c.dataset.validacionCampo = "1";
+                var e = c.nextElementSibling && c.nextElementSibling.classList.contains("field-error-inline") ? c.nextElementSibling : document.createElement("small");
+                e.className = "field-error-inline"; e.style.cssText = "display:block;color:#dc2626;font-size:12px;margin-top:4px;font-weight:500;";
+                if (!e.parentNode) c.insertAdjacentElement("afterend", e);
+                function v() { var x = c.required && !c.value.trim(), i = x || !c.validity.valid; e.textContent = i ? (x ? "Este campo es obligatorio." : c.validationMessage) : ""; c.setAttribute("aria-invalid", i ? "true" : "false"); return !i; }
+                ["input", "change", "blur"].forEach(function (t) { c.addEventListener(t, v); });
+                if (c.form) c.form.addEventListener("submit", function (a) { if (!v()) a.preventDefault(); });
+              })(document.currentScript.previousElementSibling);
+            </script>
           </div>
           <div class="form-group">
             <label> Apellido </label>
-            <input
-              class="form-input"
-              type="text"
-              name="apellido"
-              placeholder="Tu apellido"
-              pattern="[A-Za-zÁÉÍÓÚÜÑáéíóúüñ .'\-]{2,}"
-              title="Ingresa tu apellido completo."
-              required
-            />
+            <input class="form-input" type="text" name="apellido" placeholder="Tu apellido" pattern="[A-Za-zÁÉÍÓÚÜÑáéíóúüñ .'-]{2,}" title="Ingresa tu apellido completo." required />
+            <script>
+              (function (c) {
+                if (!c || c.dataset.validacionCampo) return; c.dataset.validacionCampo = "1";
+                var e = c.nextElementSibling && c.nextElementSibling.classList.contains("field-error-inline") ? c.nextElementSibling : document.createElement("small");
+                e.className = "field-error-inline"; e.style.cssText = "display:block;color:#dc2626;font-size:12px;margin-top:4px;font-weight:500;";
+                if (!e.parentNode) c.insertAdjacentElement("afterend", e);
+                function v() { var x = c.required && !c.value.trim(), i = x || !c.validity.valid; e.textContent = i ? (x ? "Este campo es obligatorio." : c.validationMessage) : ""; c.setAttribute("aria-invalid", i ? "true" : "false"); return !i; }
+                ["input", "change", "blur"].forEach(function (t) { c.addEventListener(t, v); });
+                if (c.form) c.form.addEventListener("submit", function (a) { if (!v()) a.preventDefault(); });
+              })(document.currentScript.previousElementSibling);
+            </script>
           </div>
           <div class="form-group">
             <label> Vehículo </label>
-            <select
-              class="form-input"
-              name="vehiculo"
-              required
-            >
-              <option value="" selected disabled>
-                Selecciona un vehículo
-              </option>
+            <select class="form-input" name="vehiculo" required>
+              <option value="" selected disabled>Selecciona un vehículo</option>
               <option value="Bicicleta">Bicicleta</option>
               <option value="Moto">Moto</option>
-              <option value="Patineta electrica">
-                Patineta eléctrica
-              </option>
+              <option value="Patineta electrica">Patineta eléctrica</option>
               <option value="Carro">Carro</option>
             </select>
+            <script>
+              (function (c) {
+                if (!c || c.dataset.validacionCampo) return; c.dataset.validacionCampo = "1";
+                var e = c.nextElementSibling && c.nextElementSibling.classList.contains("field-error-inline") ? c.nextElementSibling : document.createElement("small");
+                e.className = "field-error-inline"; e.style.cssText = "display:block;color:#dc2626;font-size:12px;margin-top:4px;font-weight:500;";
+                if (!e.parentNode) c.insertAdjacentElement("afterend", e);
+                function v() { var x = c.required && !c.value.trim(), i = x || !c.validity.valid; e.textContent = i ? (x ? "Este campo es obligatorio." : c.validationMessage) : ""; c.setAttribute("aria-invalid", i ? "true" : "false"); return !i; }
+                ["input", "change", "blur"].forEach(function (t) { c.addEventListener(t, v); });
+                if (c.form) c.form.addEventListener("submit", function (a) { if (!v()) a.preventDefault(); });
+              })(document.currentScript.previousElementSibling);
+            </script>
           </div>
           <div class="form-group">
             <label> Dirección </label>
-            <input
-              class="form-input"
-              type="text"
-              name="direccion"
-              placeholder="Ej. Calle 123 #45-67"
-              maxlength="150"
-              required
-            />
+            <input class="form-input" type="text" name="direccion" placeholder="Ej. Calle 123 #45-67" maxlength="150" required />
+            <script>
+              (function (c) {
+                if (!c || c.dataset.validacionCampo) return; c.dataset.validacionCampo = "1";
+                var e = c.nextElementSibling && c.nextElementSibling.classList.contains("field-error-inline") ? c.nextElementSibling : document.createElement("small");
+                e.className = "field-error-inline"; e.style.cssText = "display:block;color:#dc2626;font-size:12px;margin-top:4px;font-weight:500;";
+                if (!e.parentNode) c.insertAdjacentElement("afterend", e);
+                function v() { var x = c.required && !c.value.trim(), i = x || !c.validity.valid; e.textContent = i ? (x ? "Este campo es obligatorio." : c.validationMessage) : ""; c.setAttribute("aria-invalid", i ? "true" : "false"); return !i; }
+                ["input", "change", "blur"].forEach(function (t) { c.addEventListener(t, v); });
+                if (c.form) c.form.addEventListener("submit", function (a) { if (!v()) a.preventDefault(); });
+              })(document.currentScript.previousElementSibling);
+            </script>
           </div>
           <div class="form-group">
             <label> Email </label>
-            <input
-              class="form-input"
-              type="email"
-              name="email"
-              placeholder="tu@email.com"
-              required
-            />
+            <input class="form-input" type="email" name="email" placeholder="tu@email.com" required />
+            <script>
+              (function (c) {
+                if (!c || c.dataset.validacionCampo) return; c.dataset.validacionCampo = "1";
+                var e = c.nextElementSibling && c.nextElementSibling.classList.contains("field-error-inline") ? c.nextElementSibling : document.createElement("small");
+                e.className = "field-error-inline"; e.style.cssText = "display:block;color:#dc2626;font-size:12px;margin-top:4px;font-weight:500;";
+                if (!e.parentNode) c.insertAdjacentElement("afterend", e);
+                function v() { var x = c.required && !c.value.trim(), i = x || !c.validity.valid; e.textContent = i ? (x ? "Este campo es obligatorio." : c.validationMessage) : ""; c.setAttribute("aria-invalid", i ? "true" : "false"); return !i; }
+                ["input", "change", "blur"].forEach(function (t) { c.addEventListener(t, v); });
+                if (c.form) c.form.addEventListener("submit", function (a) { if (!v()) a.preventDefault(); });
+              })(document.currentScript.previousElementSibling);
+            </script>
           </div>
           <div class="form-group">
             <label>Contraseña</label>
-            <input
-              class="form-input"
-              type="password"
-              name="password"
-              autocomplete="new-password"
-              minlength="8"
-            />
+            <input class="form-input" id="password_repartidor" type="password" name="password" autocomplete="new-password" minlength="8" required />
+            <script>
+              (function (c) {
+                if (!c || c.dataset.validacionCampo) return; c.dataset.validacionCampo = "1";
+                var e = c.nextElementSibling && c.nextElementSibling.classList.contains("field-error-inline") ? c.nextElementSibling : document.createElement("small");
+                e.className = "field-error-inline"; e.style.cssText = "display:block;color:#dc2626;font-size:12px;margin-top:4px;font-weight:500;";
+                if (!e.parentNode) c.insertAdjacentElement("afterend", e);
+                function v() { var x = c.required && !c.value.trim(), i = x || !c.validity.valid; e.textContent = i ? (x ? "Este campo es obligatorio." : c.validationMessage) : ""; c.setAttribute("aria-invalid", i ? "true" : "false"); return !i; }
+                ["input", "change", "blur"].forEach(function (t) { c.addEventListener(t, v); });
+                if (c.form) c.form.addEventListener("submit", function (a) { if (!v()) a.preventDefault(); });
+              })(document.currentScript.previousElementSibling);
+            </script>
           </div>
           <div class="form-group">
             <label>Confirmar contraseña</label>
-            <input
-              class="form-input"
-              type="password"
-              name="password_confirmation"
-              autocomplete="new-password"
-              minlength="8"
-            />
+            <input class="form-input" id="password-confirmation_repartidor" type="password" name="password_confirmation" autocomplete="new-password" minlength="8" required />
+            <script>
+              (function (c) {
+                if (!c || c.dataset.validacionCampo) return; c.dataset.validacionCampo = "1";
+                var e = c.nextElementSibling && c.nextElementSibling.classList.contains("field-error-inline") ? c.nextElementSibling : document.createElement("small");
+                e.className = "field-error-inline"; e.style.cssText = "display:block;color:#dc2626;font-size:12px;margin-top:4px;font-weight:500;";
+                if (!e.parentNode) c.insertAdjacentElement("afterend", e);
+                var pass = document.getElementById("password_repartidor");
+                function v() { var match = pass ? c.value === pass.value : true; var x = c.required && !c.value.trim(), i = x || !c.validity.valid || !match; e.textContent = i ? (x ? "Este campo es obligatorio." : !match ? "Las contraseñas no coinciden." : c.validationMessage) : ""; c.setAttribute("aria-invalid", i ? "true" : "false"); return !i; }
+                ["input", "change", "blur"].forEach(function (t) { c.addEventListener(t, v); });
+                if (pass) pass.addEventListener("input", v);
+                if (c.form) c.form.addEventListener("submit", function (a) { if (!v()) a.preventDefault(); });
+              })(document.currentScript.previousElementSibling);
+            </script>
           </div>
           <div id="joinDel-step2">
             <h2>Casi listo</h2>
             <br />
             <br />
             <p class="form-sub">
-              En el siguiente paso podrás adjuntar tus
-              documentos.
+              En el siguiente paso podrás adjuntar tus documentos.
             </p>
           </div>
           <br />
           <div class="terms-check">
-            <input
-              type="checkbox"
-              id="termsDel"
-              name="terminos"
-              value="aceptado"
-              required
-            />
+            <input type="checkbox" id="termsDel" name="terminos" value="aceptado" required />
+            <script>
+              (function (c) {
+                if (!c || c.dataset.validacionCampo) return; c.dataset.validacionCampo = "1";
+                var e = c.nextElementSibling && c.nextElementSibling.classList.contains("field-error-inline") ? c.nextElementSibling : document.createElement("small");
+                e.className = "field-error-inline"; e.style.cssText = "display:block;color:#dc2626;font-size:12px;margin-top:4px;font-weight:500;";
+                if (!e.parentNode) c.insertAdjacentElement("afterend", e);
+                function v() { var x = c.required && !c.checked; e.textContent = x ? "Debes aceptar los términos y condiciones." : ""; c.setAttribute("aria-invalid", x ? "true" : "false"); return !x; }
+                ["change"].forEach(function (t) { c.addEventListener(t, v); });
+                if (c.form) c.form.addEventListener("submit", function (a) { if (!v()) a.preventDefault(); });
+              })(document.currentScript.previousElementSibling);
+            </script>
             <label for="termsDel">
-              Acepto los términos y condiciones de Shizen y
-              la política de privacidad.
+              Acepto los términos y condiciones de Shizen y la política de privacidad.
             </label>
           </div>
           <button class="btn-primary-full" type="submit">

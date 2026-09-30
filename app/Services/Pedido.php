@@ -41,40 +41,54 @@ class Pedido
             throw new InvalidArgumentException('El carrito está vacío.');
         }
 
-        $productIds = collect($items)
-            ->pluck('id')
-            ->map(fn ($id): int => (int) $id)
-            ->filter()
-            ->unique()
-            ->values();
-        $products = DB::table('menu_items')
-            ->whereIn('id_menu_item', $productIds)
-            ->select('id_menu_item as id', 'id_negocio', 'nombre', 'precio')
-            ->get()
-            ->keyBy('id');
-
-        if ($products->count() !== $productIds->count()) {
-            throw new RuntimeException('Uno de los platos ya no está disponible.');
-        }
-
-        $total = 0;
-        $description = [];
+        $quantities = [];
         foreach ($items as $item) {
             $id = (int) ($item['id'] ?? 0);
             $quantity = (int) ($item['quantity'] ?? 0);
-            if ($quantity < 1 || $quantity > 99 || !$products->has($id)) {
+            if ($id < 1 || $quantity < 1 || $quantity > 99) {
                 throw new RuntimeException('La cantidad de un plato no es válida.');
             }
-
-            $product = $products->get($id);
-            $total += (int) $product->precio * $quantity;
-            $description[] = $quantity . 'x ' . $product->nombre;
+            $quantities[$id] = ($quantities[$id] ?? 0) + $quantity;
+            if ($quantities[$id] > 99) {
+                throw new RuntimeException('La cantidad de un plato no es válida.');
+            }
         }
 
-        $businessId = (int) ($products->first()->id_negocio ?? 1);
-        $address = trim($data['direccion'] . ' ' . ($data['localidad'] ?? ''));
+        return DB::transaction(function () use ($userId, $quantities, $data): int {
+            $products = DB::table('menu_items')
+                ->whereIn('id_menu_item', array_keys($quantities))
+                ->lockForUpdate()
+                ->get(['id_menu_item', 'id_negocio', 'nombre', 'precio', 'stock', 'on_promo', 'precio_promocion'])
+                ->keyBy('id_menu_item');
 
-        return DB::transaction(function () use ($userId, $items, $products, $total, $description, $businessId, $address, $data): int {
+            if ($products->count() !== count($quantities)) {
+                throw new RuntimeException('Uno de los platos ya no está disponible.');
+            }
+
+            $businessIds = $products->pluck('id_negocio')->unique();
+            if ($businessIds->count() !== 1 || !$businessIds->first()) {
+                throw new RuntimeException('Cada pedido debe corresponder a un solo negocio.');
+            }
+
+            $total = 0;
+            $description = [];
+            $orderItems = [];
+            foreach ($quantities as $id => $quantity) {
+                $product = $products[$id];
+                if ($quantity > (int) $product->stock) {
+                    throw new RuntimeException('No hay suficiente existencia de ' . $product->nombre . '.');
+                }
+
+                $unitPrice = (bool) $product->on_promo && (int) $product->precio_promocion > 0
+                    ? (int) $product->precio_promocion
+                    : (int) $product->precio;
+                $total += $unitPrice * $quantity;
+                $description[] = $quantity . 'x ' . $product->nombre;
+                $orderItems[] = ['id' => (int) $id, 'quantity' => $quantity, 'price' => $unitPrice];
+            }
+
+            $businessId = (int) $businessIds->first();
+            $address = trim($data['direccion'] . ' ' . ($data['localidad'] ?? ''));
             $orderId = ((int) DB::table('pedido')->lockForUpdate()->max('id_pedido')) + 1;
             $purchaseId = ((int) DB::table('compra')->lockForUpdate()->max('id_compra')) + 1;
 
@@ -88,14 +102,13 @@ class Pedido
                 'fecha_creacion' => now(),
             ]);
 
-            foreach ($items as $item) {
-                $product = $products[(int) $item['id']];
+            foreach ($orderItems as $item) {
                 DB::table('detalle_pedido')->insert([
                     'id_pedido' => $orderId,
-                    'id_menu_item' => $product->id,
-                    'valor' => (int) $product->precio,
+                    'id_menu_item' => $item['id'],
+                    'valor' => $item['price'],
                     'fecha' => now(),
-                    'cantidad' => (int) $item['quantity'],
+                    'cantidad' => $item['quantity'],
                 ]);
             }
 
@@ -115,6 +128,11 @@ class Pedido
                 'estado' => 'Pendiente',
                 'codigo_entrega' => (string) random_int(100000, 999999),
             ]);
+
+            DB::table('carrito')
+                ->where('id_usuario', $userId)
+                ->whereIn('id_menu_item', array_keys($quantities))
+                ->delete();
 
             return $orderId;
         });
@@ -145,9 +163,17 @@ class Pedido
 
     public function isRated(int $userId, int $orderId): bool
     {
-        return DB::table('calificacion')
+        return DB::table('calificacion_repartidor')
             ->where('id_usuario', $userId)
             ->where('id_pedido', $orderId)
+            ->exists();
+    }
+
+    public function isBusinessRated(int $userId, int $businessId): bool
+    {
+        return DB::table('calificacion')
+            ->where('id_usuario', $userId)
+            ->where('id_negocio', $businessId)
             ->exists();
     }
 
@@ -190,16 +216,55 @@ class Pedido
             ->where('p.id_pedido', $orderId)
             ->where('p.id_usuario', $userId)
             ->whereNotNull('e.fecha_confirmacion')
-            ->select('p.id_negocio', 'e.id_repartidor')
+            ->select('p.id_negocio', 'e.id_entrega', 'e.id_repartidor')
             ->first();
-        if (!$order || !$order->id_repartidor) {
+        if (!$order) {
+            return false;
+        }
+
+        $courierId = $order->id_repartidor;
+        if (!$courierId) {
+            $courierId = DB::table('repartidor')->orderBy('id_repartidor')->value('id_repartidor');
+            if (!$courierId) {
+                return false;
+            }
+            DB::table('entrega')
+                ->where('id_entrega', $order->id_entrega)
+                ->whereNull('id_repartidor')
+                ->update(['id_repartidor' => $courierId]);
+        }
+
+        DB::table('calificacion_repartidor')->updateOrInsert(
+            ['id_pedido' => $orderId],
+            [
+                'id_repartidor' => $courierId,
+                'id_usuario' => $userId,
+                'puntuacion' => $score,
+                'comentario' => $comment,
+                'fecha' => now(),
+            ]
+        );
+
+        return true;
+    }
+
+    public function rateBusiness(int $userId, int $orderId, int $score, ?string $comment): bool
+    {
+        $order = DB::table('pedido as p')
+            ->join('compra as c', 'c.id_pedido', '=', 'p.id_pedido')
+            ->join('entrega as e', 'e.id_compra', '=', 'c.id_compra')
+            ->where('p.id_pedido', $orderId)
+            ->where('p.id_usuario', $userId)
+            ->whereNotNull('e.fecha_confirmacion')
+            ->value('p.id_negocio');
+
+        if (!$order) {
             return false;
         }
 
         DB::table('calificacion')->updateOrInsert(
-            ['id_usuario' => $userId, 'id_negocio' => $order->id_negocio],
+            ['id_usuario' => $userId, 'id_negocio' => $order],
             [
-                'id_repartidor' => $order->id_repartidor,
                 'id_pedido' => $orderId,
                 'puntuacion' => $score,
                 'comentario' => $comment,

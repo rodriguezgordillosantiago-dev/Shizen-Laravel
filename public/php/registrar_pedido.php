@@ -5,7 +5,13 @@ require_once __DIR__ . '/../clases/Pedido.php';
 require_once __DIR__ . '/../clases/Validador.php';
 
 if (session_status() === PHP_SESSION_NONE) {
+    session_name('SHIZEN_CLIENTE_SESSION');
     session_start();
+}
+
+if (empty($_SESSION['id_usuario'])) {
+    header('Location: ../auth/login.php?expired=1');
+    exit;
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST' || empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], (string) ($_POST['csrf_token'] ?? ''))) {
@@ -36,10 +42,11 @@ try {
         idUsuario: $idUsuario
     );
 
-    echo '<!doctype html><meta charset="utf-8"><title>Pedido recibido</title><script>localStorage.removeItem("shizenCart");</script><p>Pedido #' . $orderId . ' registrado correctamente. <a href="../index.php">Volver a Shizen</a></p>';
+    header('Location: pedido.php?id=' . $orderId . '&created=1');
+    exit;
 } catch (Throwable $exception) {
     error_log('Error al registrar pedido: ' . $exception->getMessage());
     http_response_code(422);
-    exit('No fue posible registrar el pedido. Verifica los productos e inténtalo de nuevo.');
+    exit('No fue posible registrar el pedido: ' . htmlspecialchars($exception->getMessage(), ENT_QUOTES, 'UTF-8'));
 }
 ?>

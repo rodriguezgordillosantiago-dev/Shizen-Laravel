@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 if (session_status() === PHP_SESSION_NONE) {
+    session_name('SHIZEN_CLIENTE_SESSION');
     session_start();
 }
 
@@ -16,6 +17,10 @@ if (empty($_SESSION['csrf_token'])) {
 
 $error    = isset($_GET['error'])   && $_GET['error']   === '1';
 $expired  = isset($_GET['expired']) && $_GET['expired'] === '1';
+$redirect = (string)($_GET['redirect'] ?? '');
+$redirect = preg_match('#^(?:php/)?[A-Za-z0-9_-]+\.php(?:\?[A-Za-z0-9_=&%-]*)?$#', $redirect) ? $redirect : '';
+$tipo = in_array($_GET['tipo'] ?? '', ['negocio', 'repartidor'], true) ? (string)$_GET['tipo'] : 'usuario';
+$tipoLabel = ['usuario' => 'cliente', 'negocio' => 'negocio', 'repartidor' => 'repartidor'][$tipo];
 $csrfToken = htmlspecialchars((string)$_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8');
 ?>
 <!DOCTYPE html>
@@ -46,6 +51,11 @@ $csrfToken = htmlspecialchars((string)$_SESSION['csrf_token'], ENT_QUOTES, 'UTF-
     .login-back { display:inline-flex; align-items:center; gap:6px; color:#3a8c3f; font-size:0.9rem; font-weight:600; text-decoration:none; margin-bottom:24px; }
     .login-back svg { width:18px; height:18px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
     .login-back:hover { text-decoration:underline; }
+    .login-terms { color:#6b7280; font-size:.8rem; text-align:center; margin:16px 0 0; }
+    .login-terms a { color:#3a8c3f; font-weight:600; }
+    .login-roles { display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin:12px 0 20px; font-size:.82rem; }
+    .login-roles a { color:#3a8c3f; text-decoration:none; }
+    .login-roles a:hover { text-decoration:underline; }
   </style>
 </head>
 <body>
@@ -60,10 +70,15 @@ $csrfToken = htmlspecialchars((string)$_SESSION['csrf_token'], ENT_QUOTES, 'UTF-
       </a>
       <img class="login-logo" src="assets/logo.png" alt="Shizen" />
       <div class="login-title">Bienvenido de vuelta</div>
-      <div class="login-sub">Accede a tu cuenta Shizen</div>
+      <div class="login-sub">Accede a tu cuenta Shizen de <?= htmlspecialchars($tipoLabel, ENT_QUOTES, 'UTF-8') ?></div>
+      <nav class="login-roles" aria-label="Tipo de cuenta">
+        <a href="login.php?tipo=usuario">Cliente</a>
+        <a href="login_negocio.php">Negocio</a>
+        <a href="login_repartidor.php">Repartidor</a>
+      </nav>
 
       <?php if ($error): ?>
-        <p class="login-error">El correo o la contrasena son incorrectos.</p>
+        <p class="login-error">Credenciales inválidas, inténtalo de nuevo</p>
       <?php endif; ?>
       <?php if ($expired): ?>
         <p class="login-info">Tu sesion expiro. Inicia sesion de nuevo.</p>
@@ -71,14 +86,51 @@ $csrfToken = htmlspecialchars((string)$_SESSION['csrf_token'], ENT_QUOTES, 'UTF-
 
       <form method="post" action="auth/login.php">
         <input type="hidden" name="csrf_token" value="<?= $csrfToken ?>">
+        <input type="hidden" name="redirect" value="<?= htmlspecialchars($redirect, ENT_QUOTES, 'UTF-8') ?>">
         <div class="modal-form-group">
           <label>Email</label>
           <input class="modal-input" name="email" type="email" placeholder="tu@email.com" autocomplete="email" required />
+<script>
+(function () {
+  const field = document.currentScript.previousElementSibling;
+  const message = document.createElement('small');
+  message.className = 'field-error-inline';
+  message.style.cssText = 'display:block;color:#dc2626;font-size:12px;margin-top:6px';
+  field.insertAdjacentElement('afterend', message);
+  function validate() {
+    
+    const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(field.value.trim());
+    field.setCustomValidity(valid ? '' : 'Ingresa un correo v?lido.');
+    message.textContent = field.dataset.touched === 'true' && !valid ? 'Ingresa un correo v?lido.' : '';
+  }
+  field.addEventListener('input', function () { field.dataset.touched = 'true'; validate(); });
+  field.addEventListener('blur', function () { field.dataset.touched = 'true'; validate(); });
+  field.form.addEventListener('submit', function () { field.dataset.touched = 'true'; validate(); });
+}());
+</script>
         </div>
         <div class="modal-form-group">
           <label>Contrasena</label>
           <div class="password-field">
             <input class="modal-input" id="lp" name="password" type="password" placeholder="Contrasena" autocomplete="current-password" minlength="6" required />
+<script>
+(function () {
+  const field = document.currentScript.previousElementSibling;
+  const message = document.createElement('small');
+  message.className = 'field-error-inline';
+  message.style.cssText = 'display:block;color:#dc2626;font-size:12px;margin-top:6px';
+  field.insertAdjacentElement('afterend', message);
+  function validate() {
+    
+    const valid = field.value.length >= 6;
+    field.setCustomValidity(valid ? '' : 'La contrase?a debe tener m?nimo 6 caracteres.');
+    message.textContent = field.dataset.touched === 'true' && !valid ? 'La contrase?a debe tener m?nimo 6 caracteres.' : '';
+  }
+  field.addEventListener('input', function () { field.dataset.touched = 'true'; validate(); });
+  field.addEventListener('blur', function () { field.dataset.touched = 'true'; validate(); });
+  field.form.addEventListener('submit', function () { field.dataset.touched = 'true'; validate(); });
+}());
+</script>
             <button class="password-toggle" type="button"
               onclick="var i=document.getElementById('lp'); i.type=i.type==='password'?'text':'password';"
               aria-label="Mostrar">&#128065;</button>
@@ -87,8 +139,8 @@ $csrfToken = htmlspecialchars((string)$_SESSION['csrf_token'], ENT_QUOTES, 'UTF-
         <button class="btn-modal-primary" type="submit" style="margin-top:10px;">Ingresar</button>
       </form>
 
+      <p class="login-terms">Al ingresar aceptas los <a href="../legal/terminos.html" target="_blank" rel="noopener">Términos y Condiciones</a>.</p>
       <div class="login-divider">Nuevo en Shizen?</div>
-      <a class="login-register" href="php/registro_usuario.php">Crear cuenta gratis</a>
     </div>
   </main>
 </body>

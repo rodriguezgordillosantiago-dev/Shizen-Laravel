@@ -203,7 +203,8 @@
   padding: 2px 8px;
   border-radius: 6px;
 }
-.btn-view-dishes {
+.btn-view-dishes,
+.btn-promo-cart {
   display: block;
   width: 100%;
   padding: 11px;
@@ -220,7 +221,8 @@
   box-sizing: border-box;
   transition: opacity 0.2s;
 }
-.btn-view-dishes:hover {
+.btn-view-dishes:hover,
+.btn-promo-cart:hover {
   opacity: 0.88;
 }
 
@@ -359,14 +361,9 @@
 .dish-img {
   height: 160px;
   background-color: #e8f5e9;
-  overflow: hidden;
+  background-size: cover;
+  background-position: center;
   position: relative;
-}
-.dish-img-image {
-  width: 100%;
-  height: 100%;
-  display: block;
-  object-fit: cover;
 }
 .dish-badge {
   position: absolute;

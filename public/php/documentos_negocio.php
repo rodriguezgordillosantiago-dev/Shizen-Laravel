@@ -4,6 +4,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/../clases/Negocio.php';
 require_once __DIR__ . '/../clases/FileManager.php';
 require_once __DIR__ . '/../clases/Validador.php';
+session_name('SHIZEN_CLIENTE_SESSION');
 session_start();
 
 $registro = $_SESSION['registro_negocio'] ?? null;
@@ -80,7 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $negocio->registrarNegocio();
 
             unset($_SESSION['registro_negocio']);
-            header('Location: ../forms/registro_exitoso.html');
+            header('Location: registro_exitoso.php');
             exit;
 
         } catch (Throwable $e) {
